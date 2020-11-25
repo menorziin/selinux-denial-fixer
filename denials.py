@@ -23,9 +23,12 @@ with open("fixes.txt","w") as fixfile:
         test=re.search("tclass",i)
         tclass=i[(test.span()[0]):].split("=")[1].split(" ")[0]
         fix="allow "
-        fix+=scontext
+        fix+=scontext          
         fix+=" "
-        fix+=tcontext
+        if scontext == tcontext:
+            fix+="self"
+        else:
+            fix+=tcontext
         fix+=":"
         fix+=tclass
         fix+=" "

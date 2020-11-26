@@ -13,6 +13,7 @@ import shutil
 
 wfixes = []
 namefile = ""
+inputfile = "denials.txt"
 
 if not os.path.exists("sepolicy"):
     os.makedirs("sepolicy")
@@ -27,12 +28,17 @@ for i in range(1, len(sys.argv)):
     elif sys.argv[i] == "-c":
         namefile = "sepolicy/" + sys.argv[i+1]
         write = False
+    elif sys.argv[i] == "-i":
+        inputfile = sys.argv[i+1]
+    elif sys.argv[i] == "-h":
+        print("Usage: denials.py [-v custom_output_file] [-c] [-i custom_input_file]")
+        break
 
 if namefile == "":
     namefile = "sepolicy/fixes.txt"
     write = False
 
-with open("denials.txt") as denfile:
+with open(inputfile) as denfile:
     data=denfile.read()
 data=data.split("\n")
 data.remove(data[-1])
@@ -66,6 +72,6 @@ for i in data:
     with open (namefile, "a+") as ffnew:
         for line in wfixes:
             if line.strip("\n") == fix.strip("\n"):
-                print(line)
+                pass
         else:
             ffnew.write(fix)

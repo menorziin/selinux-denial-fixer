@@ -11,11 +11,26 @@ import os
 import sys, getopt
 import shutil
 
+wfixes = []
+namefile = ""
+
 if not os.path.exists("sepolicy"):
     os.makedirs("sepolicy")
 else:
     shutil.rmtree("sepolicy")
     os.makedirs("sepolicy")
+
+for i in range(1, len(sys.argv)):
+    if sys.argv[i] == "-v":
+        write = True
+        namefile = "verbose"
+    elif sys.argv[i] == "-c":
+        namefile = "sepolicy/" + sys.argv[i+1]
+        write = False
+
+if namefile == "":
+    namefile = "sepolicy/fixes.txt"
+    write = False
 
 with open("denials.txt") as denfile:
     data=denfile.read()
@@ -43,9 +58,14 @@ for i in data:
     fix+=se_context
     fix+=";"
     fix+="\n"
-    if (len(sys.argv) - 1 > 0):
+    wfixes.append(fix)
+    if write:
         namefile="sepolicy/" + scontext + ".te"
-    else:
-        namefile="sepolicy/fixes.txt"
+    if not os.path.exists(namefile):
+        os.mknod(namefile)
     with open (namefile, "a+") as ffnew:
-        ffnew.write(fix)
+        for line in wfixes:
+            if line.strip("\n") == fix.strip("\n"):
+                print(line)
+        else:
+            ffnew.write(fix)

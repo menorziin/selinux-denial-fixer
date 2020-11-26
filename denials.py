@@ -7,32 +7,45 @@
 # Fixes are saved to fixes.txt
 
 import re
+import os
+import sys, getopt
+import shutil
+
+if not os.path.exists("sepolicy"):
+    os.makedirs("sepolicy")
+else:
+    shutil.rmtree("sepolicy")
+    os.makedirs("sepolicy")
+
 with open("denials.txt") as denfile:
     data=denfile.read()
 data=data.split("\n")
 data.remove(data[-1])
-with open("fixes.txt","w") as fixfile:
-    for i in data:
-        test=re.search("{",i)
-        test2=re.search("}",i)
-        se_context=i[test.span()[0]:test2.span()[0]+1]
-        test=re.search("scontext",i)
-        scontext=i[(test.span()[0]):].split(":")[2]
-        test=re.search("tcontext",i)
-        tcontext=i[(test.span()[0]):].split(":")[2]
-        test=re.search("tclass",i)
-        tclass=i[(test.span()[0]):].split("=")[1].split(" ")[0]
-        fix="allow "
-        fix+=scontext          
-        fix+=" "
-        if scontext == tcontext:
-            fix+="self"
-        else:
-            fix+=tcontext
-        fix+=":"
-        fix+=tclass
-        fix+=" "
-        fix+=se_context
-        fix+=";"
-        fix+="\n"
-        fixfile.write(fix)
+for i in data:
+    test=re.search("{",i)
+    test2=re.search("}",i)
+    se_context=i[test.span()[0]:test2.span()[0]+1]
+    test=re.search("scontext",i)
+    scontext=i[(test.span()[0]):].split(":")[2]
+    test=re.search("tcontext",i)
+    tcontext=i[(test.span()[0]):].split(":")[2]
+    test=re.search("tclass",i)
+    tclass=i[(test.span()[0]):].split("=")[1].split(" ")[0]
+    fix="allow "
+    fix+=scontext
+    fix+=" "
+    if scontext == tcontext:
+        tcontext="self"
+    fix+=tcontext
+    fix+=":"
+    fix+=tclass
+    fix+=" "
+    fix+=se_context
+    fix+=";"
+    fix+="\n"
+    if (len(sys.argv) - 1 > 0):
+        namefile="sepolicy/" + scontext + ".te"
+    else:
+        namefile="sepolicy/fixes.txt"
+    with open (namefile, "a+") as ffnew:
+        ffnew.write(fix)

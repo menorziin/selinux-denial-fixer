@@ -11,6 +11,7 @@ import os
 import sys, getopt
 import shutil
 
+version = "v1.0"
 wfixes = []
 namefile = ""
 inputfile = "denials.txt"
@@ -22,21 +23,42 @@ else:
     os.makedirs("sepolicy")
 
 for i in range(1, len(sys.argv)):
-    if sys.argv[i] == "-v":
+    if sys.argv[i] == "-v" or sys.argv[i] == "--verbose":
         write = True
         namefile = "verbose"
-    elif sys.argv[i] == "-c":
-        namefile = "sepolicy/" + sys.argv[i+1]
-        write = False
-    elif sys.argv[i] == "-i":
-        inputfile = sys.argv[i+1]
+        print("Verbose mode enabled!")
+        print("Outputting every denial into its respective file.")
+    elif sys.argv[i] == "-o" or sys.argv[i] == "--custom-output":
+        try:
+            if not "-" in sys.argv[i+1]:
+                namefile = "sepolicy/" + sys.argv[i+1]
+                write = False
+            else:
+            	sys.exit()
+        except:
+            print("No filename specified. Exiting.")
+            sys.exit()
+    elif sys.argv[i] == "-i" or sys.argv[i] == "--custom-input":
+        try:
+            if os.path.isfile(sys.argv[i+1]):
+                inputfile = sys.argv[i+1]
+            else:
+            	sys.exit()
+        except:
+            print("The specified filename doesn't exist. Exiting.")
+            sys.exit()
     elif sys.argv[i] == "-h" or sys.argv[i] == "--help":
-        print("Usage: denials.py [-v] [-c custom_output_file] [-i custom_input_file]")
-        sys.exit()
+    	print("Giovix92's SELinux denial fixer,", version)
+    	print("Usage: denials.py [-v] [-c custom_output_file] [-i custom_input_file]")
+    	sys.exit()
 
 if namefile == "":
     namefile = "sepolicy/fixes.txt"
     write = False
+
+if not os.path.isfile("denials.txt") and not os.path.isfile(inputfile):
+	print("denials.txt is missing! Exiting.")
+	sys.exit()
 
 with open(inputfile) as denfile:
     data=denfile.read()

@@ -1,10 +1,5 @@
 # Copyright (C) 2019 baalajimaestro
-#
-# Licensed under the Raphielscape Public License, Version 1.c (the "License");
-# you may not use this file except in compliance with the License.
-#
-# Save all denials line by line to denials.txt in the same folder as code
-# Fixes are saved to fixes.txt
+# Copyright (C) 2020-2021 Giovix92
 
 import re
 import os

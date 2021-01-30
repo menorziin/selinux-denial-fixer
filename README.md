@@ -22,3 +22,7 @@ just open it with notepad and save it with UTF-8 encoding.
 Credits:
 --------
 @baalajimaestro for the initial base, StackOverflow *cuz why not lol*
+
+Original license:
+-----------------
+Raphielscape Public License, version 1.c.

@@ -30,9 +30,9 @@ for i in range(1, len(sys.argv)):
         write = False
     elif sys.argv[i] == "-i":
         inputfile = sys.argv[i+1]
-    elif sys.argv[i] == "-h":
-        print("Usage: denials.py [-v custom_output_file] [-c] [-i custom_input_file]")
-        break
+    elif sys.argv[i] == "-h" or sys.argv[i] == "--help":
+        print("Usage: denials.py [-v] [-c custom_output_file] [-i custom_input_file]")
+        sys.exit()
 
 if namefile == "":
     namefile = "sepolicy/fixes.txt"

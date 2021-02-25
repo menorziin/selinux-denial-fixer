@@ -6,10 +6,12 @@ import os
 import sys, getopt
 import shutil
 
-version = "v1.0"
+version = "v1.1"
 wfixes = []
 namefile = ""
 inputfile = "denials.txt"
+
+print("Giovix92's SELinux denial fixer,", version)
 
 if not os.path.exists("sepolicy"):
     os.makedirs("sepolicy")
@@ -17,48 +19,50 @@ else:
     shutil.rmtree("sepolicy")
     os.makedirs("sepolicy")
 
+if os.path.exists("denials.txt"):
+    os.remove("denials.txt")
+
 for i in range(1, len(sys.argv)):
+    # Verbose
     if sys.argv[i] == "-v" or sys.argv[i] == "--verbose":
         write = True
         namefile = "verbose"
         print("Verbose mode enabled!")
         print("Outputting every denial into its respective file.")
-    elif sys.argv[i] == "-o" or sys.argv[i] == "--custom-output":
+    # Logcat
+    elif sys.argv[i] == "-l" or sys.argv[i] == "--logcat":
+        print("Parsing denials from logcat!")
         try:
             if not "-" in sys.argv[i+1]:
-                namefile = "sepolicy/" + sys.argv[i+1]
-                write = False
+    	        logname = sys.argv[i+1]
+    	        print("Using custom logcat!")
             else:
-            	sys.exit()
+                sys.exit()
         except:
-            print("No filename specified. Exiting.")
+    	    logname = "logcat.txt"
+        if not os.path.isfile(logname):
+            print("logcat is missing! Exiting.")
             sys.exit()
-    elif sys.argv[i] == "-i" or sys.argv[i] == "--custom-input":
-        try:
-            if os.path.isfile(sys.argv[i+1]):
-                inputfile = sys.argv[i+1]
-            else:
-            	sys.exit()
-        except:
-            print("The specified filename doesn't exist. Exiting.")
-            sys.exit()
+        os.system('cat %s | grep "avc: denied" > denials.txt' % logname)
+    # Help part
     elif sys.argv[i] == "-h" or sys.argv[i] == "--help":
-    	print("Giovix92's SELinux denial fixer,", version)
-    	print("Usage: denials.py [-v] [-c custom_output_file] [-i custom_input_file]")
+    	print("Usage: denials.py [-v] [-l logcat_name]")
     	sys.exit()
 
 if namefile == "":
     namefile = "sepolicy/fixes.txt"
     write = False
 
-if not os.path.isfile("denials.txt") and not os.path.isfile(inputfile):
-	print("denials.txt is missing! Exiting.")
+if not os.path.isfile(inputfile):
+	print("denials file is missing! Exiting.")
 	sys.exit()
 
 with open(inputfile) as denfile:
     data=denfile.read()
 data=data.split("\n")
 data.remove(data[-1])
+
+# Parsin' 'n yeetin' the data
 for i in data:
     test=re.search("{",i)
     test2=re.search("}",i)

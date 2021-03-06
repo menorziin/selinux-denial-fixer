@@ -6,27 +6,28 @@ import os
 import sys, getopt
 import shutil
 
-version = "v1.1"
+version = "v1.2"
 wfixes = []
-namefile = ""
+write = False
+namefile = "fixes.txt"
 inputfile = "denials.txt"
 
 print("Giovix92's SELinux denial fixer,", version)
 
-if not os.path.exists("sepolicy"):
-    os.makedirs("sepolicy")
-else:
+if os.path.exists("sepolicy"):
     shutil.rmtree("sepolicy")
-    os.makedirs("sepolicy")
 
 if os.path.exists("denials.txt"):
     os.remove("denials.txt")
+    
+if os.path.exists("fixes.txt"):
+    os.remove("fixes.txt")
 
 for i in range(1, len(sys.argv)):
     # Verbose
     if sys.argv[i] == "-v" or sys.argv[i] == "--verbose":
         write = True
-        namefile = "verbose"
+        os.makedirs("sepolicy")
         print("Verbose mode enabled!")
         print("Outputting every denial into its respective file.")
     # Logcat
@@ -49,50 +50,47 @@ for i in range(1, len(sys.argv)):
     	print("Usage: denials.py [-v] [-l logcat_name]")
     	sys.exit()
 
-if namefile == "":
-    namefile = "sepolicy/fixes.txt"
-    write = False
-
 if not os.path.isfile(inputfile):
 	print("denials file is missing! Exiting.")
 	sys.exit()
 
 with open(inputfile) as denfile:
-    data=denfile.read()
-data=data.split("\n")
+    data = denfile.read()
+data = data.split("\n")
 data.remove(data[-1])
 
-# Parsin' 'n yeetin' the data
+# Parsin' the data
 for i in data:
-    test=re.search("{",i)
-    test2=re.search("}",i)
-    se_context=i[test.span()[0]:test2.span()[0]+1]
-    test=re.search("scontext",i)
-    scontext=i[(test.span()[0]):].split(":")[2]
-    test=re.search("tcontext",i)
-    tcontext=i[(test.span()[0]):].split(":")[2]
-    test=re.search("tclass",i)
-    tclass=i[(test.span()[0]):].split("=")[1].split(" ")[0]
-    fix="allow "
-    fix+=scontext
-    fix+=" "
+    test = re.search("{",i)
+    test2 = re.search("}",i)
+    se_context = i[test.span()[0]:test2.span()[0]+1]
+    test = re.search("scontext",i)
+    scontext = i[(test.span()[0]):].split(":")[2]
+    test = re.search("tcontext",i)
+    tcontext = i[(test.span()[0]):].split(":")[2]
+    test = re.search("tclass",i)
+    tclass = i[(test.span()[0]):].split("=")[1].split(" ")[0]
+    fix = "allow "
+    fix += scontext
+    fix += " "
     if scontext == tcontext:
         tcontext="self"
-    fix+=tcontext
-    fix+=":"
-    fix+=tclass
-    fix+=" "
-    fix+=se_context
-    fix+=";"
-    fix+="\n"
+    fix += tcontext
+    fix += ":"
+    fix += tclass
+    fix += " "
+    fix += se_context
+    fix += ";"
+    fix += "\n"
     wfixes.append(fix)
+
+wfixes = list(dict.fromkeys(wfixes))
+for i in wfixes:
+    tempvar = i
+    tempvar = tempvar.split(" ")
     if write:
-        namefile="sepolicy/" + scontext + ".te"
+        namefile = "sepolicy/" + tempvar[1] + ".te"
     if not os.path.exists(namefile):
         os.mknod(namefile)
-    with open (namefile, "a+") as ffnew:
-        for line in wfixes:
-            if line.strip("\n") == fix.strip("\n"):
-                pass
-        else:
-            ffnew.write(fix)
+    with open(namefile, "a") as ffnew:
+        ffnew.write(i)

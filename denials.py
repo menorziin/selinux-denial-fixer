@@ -70,18 +70,9 @@ for i in data:
     tcontext = i[(test.span()[0]):].split(":")[2]
     test = re.search("tclass",i)
     tclass = i[(test.span()[0]):].split("=")[1].split(" ")[0]
-    fix = "allow "
-    fix += scontext
-    fix += " "
     if scontext == tcontext:
         tcontext="self"
-    fix += tcontext
-    fix += ":"
-    fix += tclass
-    fix += " "
-    fix += se_context
-    fix += ";"
-    fix += "\n"
+    fix = f"allow {scontext} {tcontext}:{tclass} {se_context};\n"
     wfixes.append(fix)
 
 wfixes = list(dict.fromkeys(wfixes))
@@ -91,6 +82,7 @@ for i in wfixes:
     if write:
         namefile = "sepolicy/" + tempvar[1] + ".te"
     if not os.path.exists(namefile):
-        os.mknod(namefile)
+        tmp = open(namefile, "w+")
+        tmp.close()
     with open(namefile, "a") as ffnew:
         ffnew.write(i)

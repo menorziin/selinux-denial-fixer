@@ -6,7 +6,7 @@ import os
 import sys, getopt
 import shutil
 
-version = "v1.2"
+version = "v1.2.1"
 wfixes = []
 write = False
 namefile = "fixes.txt"
@@ -43,6 +43,21 @@ for i in range(1, len(sys.argv)):
     	    logname = "logcat.txt"
         if not os.path.isfile(logname):
             print("logcat is missing! Exiting.")
+            sys.exit()
+        os.system('cat %s | grep "avc: denied" > denials.txt' % logname)
+    # Dmesg
+    elif sys.argv[i] == "-d" or sys.argv[i] == "--dmesg":
+        print("Parsing denials from dmesg!")
+        try:
+            if not "-" in sys.argv[i+1]:
+    	        logname = sys.argv[i+1]
+    	        print("Using custom dmesg!")
+            else:
+                sys.exit()
+        except:
+    	    logname = "dmesg.txt"
+        if not os.path.isfile(logname):
+            print("dmesg is missing! Exiting.")
             sys.exit()
         os.system('cat %s | grep "avc: denied" > denials.txt' % logname)
     # Help part

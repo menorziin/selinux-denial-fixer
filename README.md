@@ -6,9 +6,11 @@ Usage:
 Run into WSL/your preferred Linux terminal: `python3 denials.py`.
 
 - `-v` enables verbose mode. It'll output every denial into its respective file.
+- `-c` cleans up your working directory from unnecessary files.
 - `-l` enables the logcat parsing mode. You can specify a custom logcat name, example: `-l foo.txt`.
 The denials.txt file will be created automatically.
 - `-d` enables the dmesg parsing mode. Acts like logcat mode.
+- `-h` shows the help page.
 
 **Troubleshooting:**
 - Make sure your file is actually readable by your Linux's CLI text editor! Sometimes if you pick logs in Windows will break encoding. To solve this, 

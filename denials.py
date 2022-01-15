@@ -91,6 +91,8 @@ for i in data:
     if scontext == tcontext:
         tcontext="self"
     fix = f"allow {scontext} {tcontext}:{tclass} {se_context};\n"
+    if tclass == "binder" and "call" in se_context or "transfer" in se_context:
+        fix = f"binder_call({scontext}, {tcontext})\n"
     wfixes.append(fix)
 
 wfixes = list(dict.fromkeys(wfixes))

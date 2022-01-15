@@ -34,6 +34,8 @@ group.add_argument("-l", "--logcat", default="logcat.txt", metavar="logcat_name"
     help="Uses a custom logcat file instead of the logcat.txt default file.")
 group.add_argument("-d", "--dmesg", default="dmesg.txt", metavar="dmesg_name", nargs='?',
     help="Uses a custom dmesg file instead of the dmesg.txt default file.")
+parser.add_argument("-s", "--sanitize",  action='store_true',
+    help="Sanitizes logcat file encoding")
 args = parser.parse_args()
 
 if args.cleanup:
@@ -66,6 +68,11 @@ if args.logcat is None or logname is None:
     if not os.path.isfile(logname):
         print("Logcat file is missing! Exiting.")
         sys.exit()
+    os.system('cat %s | grep "avc: denied" > denials.txt' % logname)
+
+if args.sanitize:
+    print("Sanitizing file encoding!")
+    os.system('dos2unix %s' % logname)
     os.system('cat %s | grep "avc: denied" > denials.txt' % logname)
 
 if not os.path.isfile(inputfile):

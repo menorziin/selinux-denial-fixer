@@ -100,6 +100,11 @@ for i in data:
     fix = f"allow {scontext} {tcontext}:{tclass} {se_context};\n"
     if tclass == "binder" and "call" in se_context or "transfer" in se_context:
         fix = f"binder_call({scontext}, {tcontext})\n"
+    if "prop" in tcontext:
+        if "read" in se_context or "getattr" in se_context or "ioctl" in se_context or "lock" in se_context or "open" in se_context:
+            fix = f"get_prop({scontext}, {tcontext})\n"
+        if "write" in se_context or "set" in se_context or "append" in se_context:
+            fix = f"set_prop({scontext}, {tcontext})\n"
     wfixes.append(fix)
 
 wfixes = list(dict.fromkeys(wfixes))

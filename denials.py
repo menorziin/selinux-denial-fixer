@@ -24,12 +24,36 @@ if os.path.exists("denials.txt"):
 if os.path.exists("fixes.txt"):
     os.remove("fixes.txt")
 
+def gen_fix(string):
+    test = re.search("{",string)
+    test2 = re.search("}",string)
+    se_context = string[test.span()[0]:test2.span()[0]+1]
+    test = re.search("scontext",string)
+    scontext = string[(test.span()[0]):].split(":")[2]
+    test = re.search("tcontext",string)
+    tcontext = string[(test.span()[0]):].split(":")[2]
+    test = re.search("tclass",string)
+    tclass = string[(test.span()[0]):].split("=")[1].split(" ")[0]
+    if scontext == tcontext:
+        tcontext="self"
+    fix = f"allow {scontext} {tcontext}:{tclass} {se_context};\n"
+    if tclass == "binder" and "call" in se_context or "transfer" in se_context:
+        fix = f"binder_call({scontext}, {tcontext})\n"
+    if "prop" in tcontext:
+        if "read" in se_context or "getattr" in se_context or "ioctl" in se_context or "lock" in se_context or "open" in se_context:
+            fix = f"get_prop({scontext}, {tcontext})\n"
+        if "write" in se_context or "set" in se_context or "append" in se_context:
+            fix = f"set_prop({scontext}, {tcontext})\n"
+    return fix
+
 parser = argparse.ArgumentParser(description="Address your SELinux denials.", prog="denials.py")
 group = parser.add_mutually_exclusive_group()
 parser.add_argument("-c", "--cleanup", action='store_true',
     help="Cleans up the working directory.")
 group.add_argument("-d", "--dmesg", default="dmesg.txt", metavar="dmesg_name", nargs='?',
     help="Uses a custom dmesg file instead of the dmesg.txt default file.")
+parser.add_argument("-i", "--interactive", action="store_true",
+    help="Interactive mode.")
 group.add_argument("-l", "--logcat", default="logcat.txt", metavar="logcat_name", nargs='?',
     help="Uses a custom logcat file instead of the logcat.txt default file.")
 parser.add_argument("-s", "--sanitize",  action='store_true',
@@ -41,6 +65,23 @@ args = parser.parse_args()
 if args.cleanup:
     print("Cleaned up!")
     sys.exit()
+
+if args.interactive:
+    print("Interactive mode, enter your denials here.")
+    print("Use exit/quit to quit this session.")
+    while True:
+        print("")
+        string = input("> ")
+        if string == "exit" or string == "quit":
+            sys.exit()
+        elif string == "clear":
+            os.system("clear")
+        else:
+            try:
+                print("Fix:", gen_fix(string).strip("\n"))
+            except:
+                print("Invalid denial. Did you type it correctly?")
+
 
 if args.verbose:
     write = True
@@ -86,26 +127,7 @@ data.remove(data[-1])
 
 # Parsin' the data
 for i in data:
-    test = re.search("{",i)
-    test2 = re.search("}",i)
-    se_context = i[test.span()[0]:test2.span()[0]+1]
-    test = re.search("scontext",i)
-    scontext = i[(test.span()[0]):].split(":")[2]
-    test = re.search("tcontext",i)
-    tcontext = i[(test.span()[0]):].split(":")[2]
-    test = re.search("tclass",i)
-    tclass = i[(test.span()[0]):].split("=")[1].split(" ")[0]
-    if scontext == tcontext:
-        tcontext="self"
-    fix = f"allow {scontext} {tcontext}:{tclass} {se_context};\n"
-    if tclass == "binder" and "call" in se_context or "transfer" in se_context:
-        fix = f"binder_call({scontext}, {tcontext})\n"
-    if "prop" in tcontext:
-        if "read" in se_context or "getattr" in se_context or "ioctl" in se_context or "lock" in se_context or "open" in se_context:
-            fix = f"get_prop({scontext}, {tcontext})\n"
-        if "write" in se_context or "set" in se_context or "append" in se_context:
-            fix = f"set_prop({scontext}, {tcontext})\n"
-    wfixes.append(fix)
+    wfixes.append(gen_fix(i))
 
 wfixes = list(dict.fromkeys(wfixes))
 for i in wfixes:

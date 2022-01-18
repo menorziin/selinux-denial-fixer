@@ -6,7 +6,7 @@ import getopt, re
 import os, sys, shutil
 
 
-version = "v1.3"
+version = "v1.4"
 wfixes = []
 write = False
 namefile = "fixes.txt"

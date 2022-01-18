@@ -24,18 +24,18 @@ if os.path.exists("denials.txt"):
 if os.path.exists("fixes.txt"):
     os.remove("fixes.txt")
 
-parser = argparse.ArgumentParser(description="Generate Fixes for your SELinux Denials.", prog="denials.py")
+parser = argparse.ArgumentParser(description="Address your SELinux denials.", prog="denials.py")
 group = parser.add_mutually_exclusive_group()
-parser.add_argument("-v", "--verbose", action='store_true',
-    help="Enable verbose mode: outputs every denial into its respective file.")
 parser.add_argument("-c", "--cleanup", action='store_true',
     help="Cleans up the working directory.")
-group.add_argument("-l", "--logcat", default="logcat.txt", metavar="logcat_name", nargs='?',
-    help="Uses a custom logcat file instead of the logcat.txt default file.")
 group.add_argument("-d", "--dmesg", default="dmesg.txt", metavar="dmesg_name", nargs='?',
     help="Uses a custom dmesg file instead of the dmesg.txt default file.")
+group.add_argument("-l", "--logcat", default="logcat.txt", metavar="logcat_name", nargs='?',
+    help="Uses a custom logcat file instead of the logcat.txt default file.")
 parser.add_argument("-s", "--sanitize",  action='store_true',
     help="Sanitizes logcat file encoding")
+parser.add_argument("-v", "--verbose", action='store_true',
+    help="Enable verbose mode: outputs every denial into its respective file.")
 args = parser.parse_args()
 
 if args.cleanup:

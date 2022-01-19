@@ -14,6 +14,10 @@ The denials.txt file will be created automatically.
 - `-s` sanitizes log file encoding before processing it.
 - `-h` shows the help page.
 
+Please, **do not address random things**. (see untrusted_apps, system_server...)
+
+If you need to do something like that, refer to the [LineageOS guide](https://lineageos.org/engineering/HowTo-SELinux/).
+
 Credits:
 --------
 @baalajimaestro for the initial base, StackOverflow *cuz why not lol*

@@ -5,6 +5,7 @@ Usage:
 -------
 Run into WSL/your preferred Linux terminal: `python3 denials.py`.
 
+- `-1 denial` outputs only the fix for the inserted denial.
 - `-v` enables verbose mode. It'll output every denial into its respective file.
 - `-c` cleans up your working directory from unnecessary files.
 - `-l` enables the logcat parsing mode. You can specify a custom logcat name, example: `-l foo.txt`.

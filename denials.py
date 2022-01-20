@@ -13,8 +13,6 @@ namefile = "fixes.txt"
 inputfile = "denials.txt"
 logname = None
 
-print(f"Giovix92's SELinux denial fixer, {version}.")
-
 if os.path.exists("sepolicy"):
     shutil.rmtree("sepolicy")
 
@@ -48,6 +46,8 @@ def gen_fix(string):
 
 parser = argparse.ArgumentParser(description="Address your SELinux denials.", prog="denials.py")
 group = parser.add_mutually_exclusive_group()
+group.add_argument("-1", "--oneshot", metavar="denial", nargs="?",
+                   help="Takes as input a denial and just outputs the fix.")
 parser.add_argument("-c", "--cleanup", action='store_true',
     help="Cleans up the working directory.")
 group.add_argument("-d", "--dmesg", default="dmesg.txt", metavar="dmesg_name", nargs='?',
@@ -61,6 +61,12 @@ parser.add_argument("-s", "--sanitize",  action='store_true',
 parser.add_argument("-v", "--verbose", action='store_true',
     help="Enable verbose mode: outputs every denial into its respective file.")
 args = parser.parse_args()
+
+if not args.oneshot is None:
+    print(gen_fix(args.oneshot).strip("\n"))
+    sys.exit()
+
+print(f"Giovix92's SELinux denial fixer, {version}.")
 
 if args.cleanup:
     print("Cleaned up!")

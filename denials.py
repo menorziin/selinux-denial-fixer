@@ -139,7 +139,7 @@ wfixes = list(dict.fromkeys(wfixes))
 for i in wfixes:
     tempvar = i.split(" ")
     if write:
-        namefile = "sepolicy/" + tempvar[1] + ".te"
+        namefile = "sepolicy/" + tempvar[1].strip("\n").strip(")") + ".te"
     if not os.path.exists(namefile):
         tmp = open(namefile, "w+")
         tmp.close()
